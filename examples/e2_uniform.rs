@@ -3,8 +3,9 @@ use glium::{implement_vertex, uniform, Surface};
 #[derive(Copy, Clone)]
 struct Vertex {
     position: [f32; 2],
+    color: [f32; 3],
 }
-implement_vertex!(Vertex, position);
+implement_vertex!(Vertex, position, color);
 
 fn main() {
     let event_loop = winit::event_loop::EventLoopBuilder::new()
@@ -17,12 +18,15 @@ fn main() {
 
     let vertex1 = Vertex {
         position: [-0.5, -0.5],
+        color: [1.0, 0.0, 0.0],
     };
     let vertex2 = Vertex {
         position: [0.0, 0.5],
+        color: [0.0, 1.0, 0.0],
     };
     let vertex3 = Vertex {
         position: [0.5, -0.25],
+        color: [0.0, 0.0, 1.0],
     };
     let triangle_vertices = vec![vertex1, vertex2, vertex3];
 
@@ -33,10 +37,13 @@ fn main() {
         #version 140
 
         in vec2 position;
+        in vec3 color;     
+        out vec3 vertex_color;
 
         uniform mat4 matrix;
 
         void main() {
+            vertex_color = color;
             gl_Position = matrix * vec4(position, 0.0, 1.0);
         }
     "#;
@@ -45,10 +52,13 @@ fn main() {
         #version 140
 
         in vec2 position;
+        in vec3 color;     
+        out vec3 vertex_color;
 
         uniform float x;
     
         void main() {
+            vertex_color = color;
             vec2 pos = position;
             pos.x += x;
             gl_Position = vec4(pos, 0.0, 1.0);
@@ -58,10 +68,11 @@ fn main() {
     let fragment_shader_src = r#"
         #version 140
 
+        in vec3 vertex_color;
         out vec4 color;
-
+        
         void main() {
-            color = vec4(1.0, 0.0, 0.0, 1.0);
+            color = vec4(vertex_color, 1.0);   // We need an alpha value as well
         }
     "#;
 
@@ -106,8 +117,8 @@ fn main() {
                             &program_1,
                             &uniform! {
                                 matrix: [
-                                    [1.0, 0.0, 0.0, 0.0],
-                                    [x, 1.0, 0.0, 0.0],
+                                    [(1.-x*x).sqrt(), -x, 0.0, 0.0],
+                                    [x, (1.-x*x).sqrt(), 0.0, 0.0],
                                     [0.0, 0.0, 1.0, 0.0],
                                     [0.0, 0.0, 0.0, 1.0f32],
                                 ]
