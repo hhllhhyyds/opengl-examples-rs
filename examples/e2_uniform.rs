@@ -34,8 +34,10 @@ fn main() {
 
         in vec2 position;
 
+        uniform mat4 matrix;
+
         void main() {
-            gl_Position = vec4(position, 0.0, 1.0);
+            gl_Position = matrix * vec4(position, 0.0, 1.0);
         }
     "#;
 
@@ -84,7 +86,7 @@ fn main() {
                     // We update `t`
                     t += 0.02;
                     // We use the sine of t as an offset, this way we get a nice smooth animation
-                    let x_off = t.sin() * 0.5;
+                    let x = t.sin() * 0.5;
 
                     let mut frame = display.draw();
                     frame.clear_color(0.0, 0.0, 0.0, 1.0);
@@ -93,7 +95,7 @@ fn main() {
                             &v_buf,
                             i_buf,
                             &program_0,
-                            &uniform! { x: x_off },
+                            &uniform! { x: x },
                             &Default::default(),
                         )
                         .unwrap();
@@ -102,7 +104,14 @@ fn main() {
                             &v_buf,
                             i_buf,
                             &program_1,
-                            &glium::uniforms::EmptyUniforms,
+                            &uniform! {
+                                matrix: [
+                                    [1.0, 0.0, 0.0, 0.0],
+                                    [x, 1.0, 0.0, 0.0],
+                                    [0.0, 0.0, 1.0, 0.0],
+                                    [0.0, 0.0, 0.0, 1.0f32],
+                                ]
+                            },
                             &Default::default(),
                         )
                         .unwrap();

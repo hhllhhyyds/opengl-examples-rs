@@ -12,10 +12,10 @@ winit = "0.29.0"
 
 
 [[example]]
-name = "create_window"
+name = "e0_create_window"
 
 [[example]]
-name = "draw_triangle"
+name = "e1_draw_triangle"
 
 [[example]]
-name = "uniform"
+name = "e2_uniform"
