@@ -20,3 +20,6 @@ name = "e1_draw_triangle"
 
 [[example]]
 name = "e2_uniform"
+
+[[example]]
+name = "e4_teapot"

@@ -72,7 +72,7 @@ fn main() {
     frame
         .draw(
             &v_buf,
-            &i_buf,
+            i_buf,
             &program_0,
             &glium::uniforms::EmptyUniforms,
             &Default::default(),
@@ -81,7 +81,7 @@ fn main() {
     frame
         .draw(
             &v_buf,
-            &i_buf,
+            i_buf,
             &program_1,
             &glium::uniforms::EmptyUniforms,
             &Default::default(),
@@ -90,12 +90,10 @@ fn main() {
     frame.finish().unwrap();
 
     let _ = event_loop.run(move |event, window_target| {
-        match event {
-            winit::event::Event::WindowEvent { event, .. } => match event {
-                winit::event::WindowEvent::CloseRequested => window_target.exit(),
-                _ => (),
-            },
-            _ => (),
+        if let winit::event::Event::WindowEvent { event, .. } = event {
+            if event == winit::event::WindowEvent::CloseRequested {
+                window_target.exit()
+            }
         };
     });
 }
