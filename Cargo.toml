@@ -16,3 +16,6 @@ name = "create_window"
 
 [[example]]
 name = "draw_triangle"
+
+[[example]]
+name = "uniform"
