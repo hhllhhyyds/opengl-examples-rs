@@ -53,6 +53,14 @@ fn main() {
     let program =
         glium::Program::from_source(&display, vertex_shader_src, fragment_shader_src, None)
             .unwrap();
+    let params = glium::DrawParameters {
+        depth: glium::Depth {
+            test: glium::draw_parameters::DepthTest::IfLess,
+            write: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
 
     event_loop
         .run(move |ev, window_target| {
@@ -64,7 +72,8 @@ fn main() {
                     // We now need to render everyting in response to a RedrawRequested event due to the animation
                     winit::event::WindowEvent::RedrawRequested => {
                         let mut target = display.draw();
-                        target.clear_color(0.0, 0.0, 1.0, 1.0);
+
+                        target.clear_color_and_depth((0.0, 0.0, 1.0, 1.0), 1.0);
 
                         let matrix = [
                             [0.01, 0.0, 0.0, 0.0],
@@ -81,7 +90,7 @@ fn main() {
                                 &indices,
                                 &program,
                                 &uniform! { matrix: matrix, u_light: light },
-                                &Default::default(),
+                                &params,
                             )
                             .unwrap();
                         target.finish().unwrap();
