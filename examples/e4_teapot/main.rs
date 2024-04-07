@@ -1,5 +1,8 @@
+use std::{cell::RefCell, rc::Rc};
+
+use glam::Vec3;
 use glium::{uniform, Surface};
-use opengl_examples_rs::helper;
+use opengl_examples_rs::{camera::Camera, helper};
 
 mod model;
 
@@ -9,6 +12,7 @@ fn main() {
         .expect("event loop building");
     let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
         .with_title("Teapot")
+        .with_inner_size(1600, 1200)
         .build(&event_loop);
 
     let positions = glium::VertexBuffer::new(&display, &model::VERTICES).unwrap();
@@ -37,47 +41,37 @@ fn main() {
         ..Default::default()
     };
 
+    let position = 250. * Vec3::Z - 50. * Vec3::Y;
+    let camera = Rc::new(RefCell::new(
+        Camera::new()
+            .with_position(position)
+            .with_up_lookat(position.cross(Vec3::X), Vec3::ZERO),
+    ));
+
     let fn_on_redraw = || {
         let mut target = display.draw();
 
         target.clear_color_and_depth((0.0, 0.0, 1.0, 1.0), 1.0);
-        let matrix = [
-            [0.01, 0.0, 0.0, 0.0],
-            [0.0, 0.01, 0.0, 0.0],
-            [0.0, 0.0, 0.01, 0.0],
-            [0.0, 0.0, 1.5, 1.0f32],
-        ];
+
         // the direction of the light
         let light = [-1.0, 0.4, 0.9f32];
-        let perspective = {
-            let (width, height) = (1.0, 0.6);
-            let aspect_ratio = height as f32 / width as f32;
 
-            let fov: f32 = 3.141592 / 3.0;
-            let zfar = 1024.0;
-            let znear = 0.1;
-
-            let f = 1.0 / (fov / 2.0).tan();
-
-            [
-                [f * aspect_ratio, 0.0, 0.0, 0.0],
-                [0.0, f, 0.0, 0.0],
-                [0.0, 0.0, (zfar + znear) / (zfar - znear), 1.0],
-                [0.0, 0.0, -(2.0 * zfar * znear) / (zfar - znear), 0.0],
-            ]
-        };
-
+        camera.borrow_mut().update();
         target
             .draw(
                 (&positions, &normals),
                 &indices,
                 &program,
-                &uniform! { matrix: matrix, perspective: perspective, u_light: light },
+                &uniform! {
+                    view: camera.borrow().view_matrix().to_cols_array_2d(),
+                    perspective: camera.borrow().perspective_matrix().to_cols_array_2d(),
+                    u_light: light
+                },
                 &params,
             )
             .unwrap();
         target.finish().unwrap();
     };
 
-    helper::event_loop_run(event_loop, &display, &window, fn_on_redraw);
+    helper::event_loop_run(event_loop, &display, &window, &camera, fn_on_redraw);
 }
