@@ -12,17 +12,6 @@ use winit::window::Window;
 
 use crate::camera::Camera;
 
-pub fn load_shader<P>(path: P) -> io::Result<String>
-where
-    P: AsRef<Path>,
-{
-    let mut file = File::open(path)?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-
-    Ok(contents)
-}
-
 pub fn event_loop_run<T, F>(
     event_loop: EventLoop<T>,
     display: &Display<WindowSurface>,
@@ -66,14 +55,23 @@ pub fn gl_draw_program<P: AsRef<Path> + std::fmt::Display>(
 ) -> Result<Program, ProgramCreationError> {
     let vertex_shader_src = load_shader(vertex_shader_path.as_ref())
         .unwrap_or_else(|_| panic!("Fail to load {}", vertex_shader_path));
-
     let fragment_shader_src = load_shader(fragment_shader_path.as_ref())
         .unwrap_or_else(|_| panic!("Fail to load {}", fragment_shader_path));
-
     glium::Program::from_source(
         display,
         vertex_shader_src.as_str(),
         fragment_shader_src.as_str(),
         None,
     )
+}
+
+fn load_shader<P>(path: P) -> io::Result<String>
+where
+    P: AsRef<Path>,
+{
+    let mut file = File::open(path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+    Ok(contents)
 }
