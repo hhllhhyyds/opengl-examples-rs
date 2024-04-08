@@ -13,7 +13,7 @@ fn main() {
         .with_inner_size(1600, 1200)
         .build(&event_loop);
 
-    let (vertices, indices) = obj_loader::load_obj("examples/model/bugatti.obj");
+    let (vertices, indices) = obj_loader::load_obj("examples/model/AlienAnimal.obj");
 
     let vb = glium::VertexBuffer::new(&display, &vertices).unwrap();
     let ib = glium::IndexBuffer::new(
@@ -40,7 +40,7 @@ fn main() {
         ..Default::default()
     };
 
-    let position = 25. * Vec3::Z - 5. * Vec3::Y;
+    let position = 50. * Vec3::Z - 10. * Vec3::Y;
     let camera = Rc::new(RefCell::new(
         Camera::new()
             .with_position(position)
