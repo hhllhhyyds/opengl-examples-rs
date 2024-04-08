@@ -1,5 +1,6 @@
 pub mod camera;
 pub mod helper;
+pub mod obj_loader;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
