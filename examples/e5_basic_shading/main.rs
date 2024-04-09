@@ -36,7 +36,7 @@ fn main() {
             write: true,
             ..Default::default()
         },
-        backface_culling: glium::draw_parameters::BackfaceCullingMode::CullClockwise,
+        backface_culling: glium::draw_parameters::BackfaceCullingMode::CullCounterClockwise,
         ..Default::default()
     };
 
@@ -52,7 +52,7 @@ fn main() {
     let fn_on_redraw = || {
         let mut target = display.draw();
 
-        target.clear_color_and_depth((0.0, 0.0, 1.0, 1.0), 1.0);
+        target.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), 1.0);
 
         // the direction of the light
         let light = [-1.0, 0.4, 0.9f32];
@@ -64,6 +64,7 @@ fn main() {
                 &ib,
                 &program,
                 &uniform! {
+                    eye_position: camera.borrow().position().to_array(),
                     view: camera.borrow().view_matrix().to_cols_array_2d(),
                     perspective: camera.borrow().perspective_matrix().to_cols_array_2d(),
                     u_light: light

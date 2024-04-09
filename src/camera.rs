@@ -125,6 +125,10 @@ impl Camera {
         &self.perspective_m
     }
 
+    pub fn position(&self) -> &Vec3 {
+        &self.position
+    }
+
     pub fn on_keyboard_event(&mut self, event: KeyEvent) {
         if let PhysicalKey::Code(code) = event.physical_key {
             match code {
